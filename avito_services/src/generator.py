@@ -21,44 +21,59 @@ def generate_draft_text(description: str, mc_id: int, source_mc_id: int) -> str:
     Returns:
         Сгенерированный текст черновика
     """
+    import re
+    
     mc = MC_DICT[mc_id]
     normalized = normalize_text(description)
     
-    # Извлекаем релевантные предложения/фразы для данной микрокатегории
-    relevant_parts = []
+    # Извлекаем релевантные фразы и ключевые слова для данной микрокатегории
+    found_phrases = set()
     
-    # Разбиваем на предложения (упрощенно)
-    sentences = re.split(r'[.!?]', description)
+    # Находим все ключевые фразы микрокатегории в тексте
+    for phrase in mc.keyPhrases:
+        norm_phrase = normalize_text(phrase)
+        if len(norm_phrase) >= 3 and norm_phrase in normalized and norm_phrase not in found_phrases:
+            found_phrases.add(norm_phrase)
     
-    for sentence in sentences:
-        sent_lower = sentence.lower().strip()
-        if not sent_lower:
-            continue
-            
-        # Проверяем, относится ли предложение к данной микрокатегории
-        for phrase in mc.keyPhrases:
-            if normalize_text(phrase) in sent_lower:
-                # Добавляем предложение, очищая от лишнего
-                clean_sentence = sentence.strip()
-                if clean_sentence and clean_sentence not in relevant_parts:
-                    relevant_parts.append(clean_sentence)
-                break
+    # Также ищем специфичные паттерны для этой микрокатегории
+    specific_patterns = {
+        101: [r"ремонт\s+под\s+ключ", r"комплексный\s+ремонт", r"полный\s+ремонт"],
+        102: [r"сантехник", r"разводка\s+труб", r"монтаж\s+сантехники", r"демонтаж\s+сантехники"],
+        103: [r"электрик", r"проводка", r"электрощит", r"розетк"],
+        104: [r"натяжной\s+потолок", r"потолок\s+в\s+коридоре", r"тканевые\s+потолки"],
+        105: [r"плитк", r"керамогранит", r"облицовка"],
+        106: [r"обои", r"оклейка", r"поклейка"],
+        107: [r"шпаклевк", r"покраск", r"малярн"],
+        108: [r"штукатурк", r"цементная\s+штукатурка"],
+        109: [r"напольн", r"ламинат", r"паркет", r"стяжка"],
+        110: [r"гкл", r"гипсокартон", r"декоративные\s+конструкции"],
+        111: [r"демонтаж", r"снос", r"мусор"],
+    }
     
-    # Если не нашли конкретных предложений, используем ключевые фразы
-    if not relevant_parts:
-        # Берем первые 2-3 ключевые фразы как основу
-        for phrase in mc.keyPhrases[:3]:
-            relevant_parts.append(f"Выполняем: {phrase}")
+    if mc_id in specific_patterns:
+        for pattern in specific_patterns[mc_id]:
+            matches = re.findall(pattern, normalized)
+            for match in matches:
+                if len(match) >= 3:
+                    found_phrases.add(match)
     
-    # Формируем итоговый текст
-    if len(relevant_parts) >= 2:
-        draft_text = ". ".join(relevant_parts[:4]) + "."
+    # Если нашли ключевые фразы - используем их
+    if found_phrases:
+        # Формируем текст из найденных фраз
+        phrases_list = list(found_phrases)[:5]  # Берём до 5 фраз
+        draft_text = ", ".join(phrases_list)
+        if len(phrases_list) > 1:
+            draft_text = draft_text + "."
+        else:
+            draft_text = draft_text + "."
     else:
-        draft_text = relevant_parts[0] if relevant_parts else f"Выполняем услуги по направлению: {mc.mcTitle}"
+        # Если не нашли конкретных фраз, используем общие ключевые фразы микрокатегории
+        draft_text = ", ".join(mc.keyPhrases[:3]) + "."
     
     # Добавляем информацию о том, что услуга предоставляется отдельно
-    if "отдельно" not in draft_text.lower():
-        draft_text = f"Отдельно выполняем: {draft_text.lower()}"
+    # Формируем префикс с названием услуги
+    service_name = mc.mcTitle.lower()
+    draft_text = f"Отдельно выполняем услуги по направлению \"{service_name}\": {draft_text.lower()}"
     
     return draft_text
 

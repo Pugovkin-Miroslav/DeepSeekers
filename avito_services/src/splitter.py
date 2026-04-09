@@ -100,17 +100,12 @@ def should_split_announcement(
         "работаем только в комплексе",
         "без дробления на этапы",
         "под ключ без дробления",
-        "все этапы выполняем как часть ремонта",
-        "выполняем в составе ремонта",
-        "другие этапы выполняем как часть ремонта",
-        "этапы выполняем все работы одной бригадой",
     ]
     
     is_complex_only = any(phrase in normalized for phrase in complex_only_phrases)
     
-    # Если явно указано, что работают только в комплексе - не сплитовать
+    # Если явно указано, что работают только в комплексе - проверяем наличие явных указаний на отдельные услуги
     if is_complex_only:
-        # Но проверяем, есть ли явные указания на отдельные услуги
         has_explicit_separate = False
         for mc_id in candidate_ids:
             if is_service_offered_separately(description, mc_id, source_mc_id):
@@ -123,11 +118,43 @@ def should_split_announcement(
     # Определяем, какие микрокатегории предлагаются отдельно
     split_ids = set()
     for mc_id in candidate_ids:
-        if is_service_offered_separately(description, mc_id, source_mc_id):
-            split_ids.add(mc_id)
+        # Для non-turnkey категорий - если услуга найдена, считаем её отдельной
+        # если нет явных признаков, что она только в составе комплекса
+        if mc_id == 101:  # Ремонт под ключ - особая категория
+            if is_service_offered_separately(description, mc_id, source_mc_id):
+                split_ids.add(mc_id)
+        else:
+            # Проверяем, не является ли упоминание частью перечисления в комплексе
+            if "как часть ремонта" in normalized or "в составе работ" in normalized or "все этапы выполняем как часть ремонта" in normalized:
+                # Но если есть явное указание на отдельную услугу - всё равно сплитим
+                if is_service_offered_separately(description, mc_id, source_mc_id):
+                    split_ids.add(mc_id)
+            else:
+                # По умолчанию считаем, что услуга предлагается отдельно
+                split_ids.add(mc_id)
     
     # Если есть хотя бы одна микрокатегория для сплита
     if split_ids:
         return True, split_ids
     
     return False, set()
+
+
+def determine_should_split(detected_mc_ids: Set[int], source_mc_id: int, has_additional_services: bool = True) -> bool:
+    """
+    Упрощенная функция определения необходимости сплита.
+    Если найдены дополнительные микрокатегории кроме исходной - нужен сплит.
+    
+    Args:
+        detected_mc_ids: Множество ID обнаруженных микрокатегорий
+        source_mc_id: ID исходной микрокатегории
+        has_additional_services: Флаг наличия дополнительных услуг
+        
+    Returns:
+        True, если нужно создавать дополнительные черновики
+    """
+    # Если есть дополнительные микрокатегории кроме исходной
+    additional_ids = detected_mc_ids - {source_mc_id}
+    if additional_ids:
+        return True
+    return False

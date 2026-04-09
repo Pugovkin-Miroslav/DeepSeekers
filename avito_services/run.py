@@ -43,16 +43,20 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.join(script_dir, 'data')
     
-    dataset_path = os.path.join(data_dir, 'rnc_dataset.csv')
+    dataset_path = os.path.join(data_dir, 'rnc_dataset_markup.csv')
     
     if not os.path.exists(dataset_path):
         print(f"Ошибка: Датасет не найден по пути {dataset_path}")
-        print("Пожалуйста, поместите файл rnc_dataset.csv в папку data/")
+        print("Пожалуйста, поместите файл rnc_dataset_markup.csv в папку data/")
         sys.exit(1)
     
     print("Загрузка датасета...")
     data = load_dataset(dataset_path)
     print(f"Загружено {len(data)} записей")
+    
+    # Путь к модели
+    from src.detector import MODEL_DIR
+    model_path = str(MODEL_DIR.absolute())
     
     # Обработка всех объявлений
     print("\nОбработка объявлений...")
@@ -105,6 +109,13 @@ def main():
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(predictions, f, ensure_ascii=False, indent=2)
     print(f"\nРезультаты сохранены в {output_path}")
+    
+    # Выводим путь к сохраненной модели
+    print(f"\nМодель сохранена в: {model_path}")
+    print(f"Файлы модели:")
+    print(f"  - {MODEL_DIR / 'tfidf_vectorizer.pkl'}")
+    print(f"  - {MODEL_DIR / 'ml_classifier.pkl'}")
+    print(f"  - {MODEL_DIR / 'multi_label_binarizer.pkl'}")
 
 
 if __name__ == "__main__":
