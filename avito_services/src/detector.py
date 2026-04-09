@@ -56,7 +56,7 @@ class MLCategoryDetector:
             analyzer='word',
             token_pattern=r'(?u)\b\w+\b'
         )
-        
+
         X = self.vectorizer.fit_transform(normalized_texts)
         
         # Преобразуем лейблы в бинарный формат
