@@ -1,17 +1,22 @@
 ```
-# Dependencies
-__pycache__/
+# Compiled and build artifacts
 *.pyc
-*.pyo
-*.pyd
+__pycache__/
 
-# Build artifacts
+# Dependencies
+.venv/
+venv/
+node_modules/
+*.egg-info/
 dist/
 build/
-*.egg-info/
+target/
 
-# Logs
+# Logs and temp files
 *.log
+*.tmp
+*.swp
+*.swo
 
 # Environment
 .env
@@ -24,23 +29,34 @@ build/
 *.swp
 *.swo
 
-# Coverage
+# Coverage reports
 .coverage
 coverage/
 htmlcov/
 
-# Python cache
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Python specific
+*.pyc
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyo
+*.pyd
+.Python
 *.so
 
 # Testing
 .pytest_cache/
 .mypy_cache/
-.hypothesis/
+.tox/
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Distribution / packaging
+*.tar.gz
+*.whl
+*.zip
+
+# Local configuration
+.env*
+!.env.example
 ```
