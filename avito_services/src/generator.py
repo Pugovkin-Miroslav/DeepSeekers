@@ -24,41 +24,33 @@ def generate_draft_text(description: str, mc_id: int, source_mc_id: int) -> str:
     mc = MC_DICT[mc_id]
     normalized = normalize_text(description)
     
-    # Извлекаем релевантные предложения/фразы для данной микрокатегории
+    # Извлекаем релевантные фразы и ключевые слова для данной микрокатегории
     relevant_parts = []
+    found_phrases = set()
     
-    # Разбиваем на предложения (упрощенно)
-    sentences = re.split(r'[.!?]', description)
+    # Находим все ключевые фразы микрокатегории в тексте
+    for phrase in mc.keyPhrases:
+        norm_phrase = normalize_text(phrase)
+        if norm_phrase in normalized and norm_phrase not in found_phrases:
+            found_phrases.add(norm_phrase)
     
-    for sentence in sentences:
-        sent_lower = sentence.lower().strip()
-        if not sent_lower:
-            continue
-            
-        # Проверяем, относится ли предложение к данной микрокатегории
-        for phrase in mc.keyPhrases:
-            if normalize_text(phrase) in sent_lower:
-                # Добавляем предложение, очищая от лишнего
-                clean_sentence = sentence.strip()
-                if clean_sentence and clean_sentence not in relevant_parts:
-                    relevant_parts.append(clean_sentence)
-                break
-    
-    # Если не нашли конкретных предложений, используем ключевые фразы
-    if not relevant_parts:
-        # Берем первые 2-3 ключевые фразы как основу
-        for phrase in mc.keyPhrases[:3]:
-            relevant_parts.append(f"Выполняем: {phrase}")
-    
-    # Формируем итоговый текст
-    if len(relevant_parts) >= 2:
-        draft_text = ". ".join(relevant_parts[:4]) + "."
+    # Если нашли ключевые фразы - используем их
+    if found_phrases:
+        # Формируем текст из найденных фраз
+        phrases_list = list(found_phrases)[:5]  # Берём до 5 фраз
+        draft_text = ", ".join(phrases_list)
+        if len(phrases_list) > 1:
+            draft_text = draft_text + "."
+        else:
+            draft_text = draft_text + "."
     else:
-        draft_text = relevant_parts[0] if relevant_parts else f"Выполняем услуги по направлению: {mc.mcTitle}"
+        # Если не нашли конкретных фраз, используем общие ключевые фразы микрокатегории
+        draft_text = ", ".join(mc.keyPhrases[:3]) + "."
     
     # Добавляем информацию о том, что услуга предоставляется отдельно
-    if "отдельно" not in draft_text.lower():
-        draft_text = f"Отдельно выполняем: {draft_text.lower()}"
+    # Формируем префикс с названием услуги
+    service_name = mc.mcTitle.lower()
+    draft_text = f"Отдельно выполняем услуги по направлению \"{service_name}\": {draft_text.lower()}"
     
     return draft_text
 
