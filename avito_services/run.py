@@ -54,6 +54,10 @@ def main():
     data = load_dataset(dataset_path)
     print(f"Загружено {len(data)} записей")
     
+    # Путь к модели
+    from src.detector import MODEL_DIR
+    model_path = str(MODEL_DIR.absolute())
+    
     # Обработка всех объявлений
     print("\nОбработка объявлений...")
     predictions = []
@@ -105,6 +109,13 @@ def main():
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(predictions, f, ensure_ascii=False, indent=2)
     print(f"\nРезультаты сохранены в {output_path}")
+    
+    # Выводим путь к сохраненной модели
+    print(f"\nМодель сохранена в: {model_path}")
+    print(f"Файлы модели:")
+    print(f"  - {MODEL_DIR / 'tfidf_vectorizer.pkl'}")
+    print(f"  - {MODEL_DIR / 'ml_classifier.pkl'}")
+    print(f"  - {MODEL_DIR / 'multi_label_binarizer.pkl'}")
 
 
 if __name__ == "__main__":

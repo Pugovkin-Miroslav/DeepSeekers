@@ -138,3 +138,23 @@ def should_split_announcement(
         return True, split_ids
     
     return False, set()
+
+
+def determine_should_split(detected_mc_ids: Set[int], source_mc_id: int, has_additional_services: bool = True) -> bool:
+    """
+    Упрощенная функция определения необходимости сплита.
+    Если найдены дополнительные микрокатегории кроме исходной - нужен сплит.
+    
+    Args:
+        detected_mc_ids: Множество ID обнаруженных микрокатегорий
+        source_mc_id: ID исходной микрокатегории
+        has_additional_services: Флаг наличия дополнительных услуг
+        
+    Returns:
+        True, если нужно создавать дополнительные черновики
+    """
+    # Если есть дополнительные микрокатегории кроме исходной
+    additional_ids = detected_mc_ids - {source_mc_id}
+    if additional_ids:
+        return True
+    return False
