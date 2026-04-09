@@ -281,6 +281,11 @@ def train_ml_model(data_path: str = None, save_model: bool = True) -> MLCategory
     detector = MLCategoryDetector()
     detector.train(texts, labels, save_model=save_model)
     
+    # Явно сохраняем модель после обучения
+    if save_model:
+        detector.save_model()
+        print(f"Model saved to {MODEL_DIR}")
+    
     print("Model trained successfully!")
     return detector
 
