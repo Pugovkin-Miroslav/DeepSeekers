@@ -13,7 +13,10 @@ from .microcatalog import (
 
 from .detector import (
     normalize_text,
-    detect_microcategories
+    detect_microcategories,
+    train_ml_model,
+    get_ml_detector,
+    MLCategoryDetector
 )
 
 from .splitter import (
