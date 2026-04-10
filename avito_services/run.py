@@ -80,23 +80,20 @@ def main():
             description=record['description']
         )
         predictions.append(result)
-        
-        if (i + 1) % 500 == 0:
-            print(f"  Обработано {i + 1}/{len(data)}")
+
+    print(f"Успешно обработано {len(data)}")
     
     # Оценка качества
-    print("\nОценка качества...")
+    print("\nОценка качества")
     metrics = evaluate_predictions(predictions, data)
+
     
-    print("\n" + "="*50)
-    print("РЕЗУЛЬТАТЫ:")
-    print("="*50)
+    print("Результаты оценки:")
     print(f"Precision (micro): {metrics['precision_micro']:.4f}")
     print(f"Recall (micro):    {metrics['recall_micro']:.4f}")
     print(f"F1-score (micro):  {metrics['f1_score_micro']:.4f}")
     print(f"Accuracy shouldSplit: {metrics['accuracy_should_split']:.4f}")
-    print("="*50)
-    
+
     # Примеры результатов
     print("\nПримеры обработки:")
     for i in range(min(5, len(predictions))):
@@ -113,7 +110,7 @@ def main():
         if pred['drafts']:
             print("Черновики:")
             for draft in pred['drafts']:
-                print(f"  - {draft['mcTitle']}: {draft['text'][:80]}...")
+                print(f"  - {draft['mcTitle']}: {draft['text']}")
     
     # Сохранение результатов
     output_path = os.path.join(script_dir, 'predictions.json')
