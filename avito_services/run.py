@@ -21,9 +21,20 @@ def load_dataset(filepath: str) -> list[dict]:
     
     records = []
     for _, row in df.iterrows():
+        # Обрабатываем случаи, когда itemId или sourceMcId не являются числами
+        try:
+            item_id = int(row['itemId'])
+        except (ValueError, TypeError):
+            continue  # Пропускаем строки с некорректным itemId
+            
+        try:
+            source_mc_id = int(row['sourceMcId'])
+        except (ValueError, TypeError):
+            continue  # Пропускаем строки с некорректным sourceMcId
+        
         record = {
-            'itemId': int(row['itemId']),
-            'sourceMcId': int(row['sourceMcId']),
+            'itemId': item_id,
+            'sourceMcId': source_mc_id,
             'sourceMcTitle': row['sourceMcTitle'],
             'description': row['description'],
             'targetDetectedMcIds': ast.literal_eval(row['targetDetectedMcIds']) if isinstance(row['targetDetectedMcIds'], str) else row['targetDetectedMcIds'],
