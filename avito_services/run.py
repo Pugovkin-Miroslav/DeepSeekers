@@ -17,7 +17,7 @@ from src.processor import process_advertisement, evaluate_predictions
 
 def load_dataset(filepath: str) -> list[dict]:
     """Загружает датасет из CSV файла."""
-    df = pd.read_csv(filepath)
+    df = pd.read_csv(filepath, sep=';')
     
     records = []
     for _, row in df.iterrows():
