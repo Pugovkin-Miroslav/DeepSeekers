@@ -100,20 +100,14 @@ def should_split_announcement(
         "работаем только в комплексе",
         "без дробления на этапы",
         "под ключ без дробления",
+        "не выезжаю отдельно",
     ]
     
     is_complex_only = any(phrase in normalized for phrase in complex_only_phrases)
     
-    # Если явно указано, что работают только в комплексе - проверяем наличие явных указаний на отдельные услуги
+    # Если явно указано, что работают только в комплексе - НЕ сплитим
     if is_complex_only:
-        has_explicit_separate = False
-        for mc_id in candidate_ids:
-            if is_service_offered_separately(description, mc_id, source_mc_id):
-                has_explicit_separate = True
-                break
-        
-        if not has_explicit_separate:
-            return False, set()
+        return False, set()
     
     # Определяем, какие микрокатегории предлагаются отдельно
     split_ids = set()

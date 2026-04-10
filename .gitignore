@@ -7,16 +7,11 @@ __pycache__/
 .venv/
 venv/
 node_modules/
-*.egg-info/
-dist/
-build/
-target/
 
 # Logs and temp files
 *.log
 *.tmp
 *.swp
-*.swo
 
 # Environment
 .env
@@ -26,37 +21,21 @@ target/
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # Coverage reports
 .coverage
 coverage/
 htmlcov/
 
-# OS generated files
-.DS_Store
-Thumbs.db
-
 # Python specific
-*.pyc
-__pycache__/
 *.pyo
 *.pyd
 .Python
 *.so
+*.egg-info/
 
-# Testing
-.pytest_cache/
-.mypy_cache/
-.tox/
-
-# Distribution / packaging
-*.tar.gz
-*.whl
-*.zip
-
-# Local configuration
-.env*
-!.env.example
+# Build directories
+dist/
+build/
+target/
 ```
